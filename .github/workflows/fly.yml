@@ -1,0 +1,27 @@
+name: Fly Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+
+jobs:
+  deploy:
+    name: Deploy app
+    runs-on: ubuntu-latest
+    concurrency: 
+      group: deploy-group  # 并发控制组
+      cancel-in-progress: true  # 可选：取消正在进行的任务
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
+
+      - name: Deploy to Fly.io
+        run: flyctl deploy --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}  # 从GitHub Secrets获取凭证
